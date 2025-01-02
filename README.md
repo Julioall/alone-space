@@ -24,6 +24,6 @@
 
 ## Objetivo
 
-O objetivo do jogo é sobreviver o maior tempo possível enquanto navega por um campo de asteroides e inimigos. À medida que o tempo passa, o jogo fica mais difícil com o aumento da velocidade e intensidade dos inimigos.
+O objetivo do jogo é sobreviver o maior tempo possível enquanto navega por um campo de asteroides e inimigos. À medida que o tempo passa, o jogo fica mais difícil com o aumento e intensidade dos inimigos.
 
 ## Boa sorte e divirta-se!
