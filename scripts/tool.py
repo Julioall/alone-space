@@ -46,4 +46,4 @@ def process_spritesheet(filename, output_name, sprite_width, sprite_height):
         print(f"Erro ao processar o spritesheet: {e}")
 
 # Usando a ferramenta
-process_spritesheet("frigate_engine.png", "frigate_engine", 64, 64)
+process_spritesheet("big-bullet.png", "big-bullet", 8, 16)

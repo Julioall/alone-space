@@ -1,5 +1,6 @@
 import pgzrun
 from pygame import Rect
+from pgzero.actor import Actor
 
 from scripts.constants import *
 from scripts.sounds import *
@@ -26,6 +27,16 @@ player_engine = Actor("frigate_engine-1")
 player_engine_animation = setup_animation(player_engine, "frigate_engine", 6)
 player_engine.x = WIDTH/2
 player_engine.y = HEIGHT-TILE_SIZE
+
+bullets = []
+bullet_animation_frames = 4
+bullet_interval = 5
+bullet_animations = {}
+
+shooting = False
+shoot_interval = 10
+shoot_timer = 0
+
 buttons = {
     "start": Rect((WIDTH // 2 - button_width // 2, 200), (button_width, button_height)),
     "audio": Rect((WIDTH // 2 - button_width // 2, 300), (button_width, button_height)),
@@ -41,11 +52,29 @@ def draw():
         draw_game()
 
 def update():
-    global player
+    global player, player_attack, global_speed, animation_interval_player_engine, shoot_timer
     adjust_speed()
     update_stars(stars, global_speed)
-    player = handle_player_input(player, global_speed, keyboard)
+    player, player_attack = handle_player_input(player, player_attack, global_speed, keyboard)
     update_animation(player_engine_animation, animation_interval_player_engine)
+    
+    # Disparo contínuo
+    if shooting:
+        shoot_timer += 1
+        if shoot_timer >= shoot_interval:
+            new_bullet = Actor("bullet-1", (player.x, player.y))
+            bullets.append(new_bullet)
+            bullet_animations[new_bullet] = setup_animation(new_bullet, "bullet", bullet_animation_frames)
+            shoot_timer = 0
+    
+    # Movendo e animando projéteis
+    for bullet in bullets[:]:
+        bullet.y -= 10
+        update_animation(bullet_animations[bullet], bullet_interval)
+        if bullet.y < 0:
+            bullets.remove(bullet)
+            del bullet_animations[bullet]
+
 
 def draw_menu():
     screen.fill(BACKGROUND_COLOR)
@@ -65,6 +94,9 @@ def draw_game():
     player_engine.x = player.x
     player_engine.draw()
 
+    for bullet in bullets:
+        bullet.draw()
+
 def adjust_speed():
     global global_speed, animation_interval_player_engine
     if hyper_speed:
@@ -75,20 +107,32 @@ def adjust_speed():
         animation_interval_player_engine = 10
 
 def on_key_down(key):
-    global current_selected_option_menu, current_screen, audio_on, hyper_speed
+    global current_selected_option_menu, current_screen, audio_on, hyper_speed, shooting
 
     if current_screen == "menu":
         current_selected_option_menu, current_screen, audio_on = handle_menu_input(current_selected_option_menu, current_screen, audio_on, MENU_OPTIONS, sounds, keyboard)
     elif current_screen == "game":
         current_screen = handle_game_input(current_screen, audio_on, sounds, keyboard)
     
+    if key == keys.E:
+        shooting = True
+    
+    if key == keys.Q:
+        new_bullet = Actor("big_bullet-1", (player.x, player.y))
+        bullets.append(new_bullet)
+        bullet_animations[new_bullet] = setup_animation(new_bullet, "big_bullet", bullet_animation_frames)
+
     if key in [keys.UP, keys.W]:
         hyper_speed = True
 
 def on_key_up(key):
-    global hyper_speed
+    global hyper_speed, shooting
     if key in [keys.UP, keys.W]:
         hyper_speed = False
+    
+    if key == keys.E:
+        shooting = False
+
 
 play_music_menu(sounds, audio_on)
 
