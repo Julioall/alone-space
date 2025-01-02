@@ -1,0 +1,14 @@
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+ROWS = 15
+COLS = 10
+TILE_SIZE = 64
+BACKGROUND_COLOR = (0, 0, 0)
+
+WIDTH = TILE_SIZE * ROWS
+HEIGHT = TILE_SIZE * COLS
+
+TITLE = "Alone Space"
+SCREEN_MENU = "menu"
+SCREEN_GAME = "game"
+MENU_OPTIONS = ["start", "audio", "exit"]
