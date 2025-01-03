@@ -10,13 +10,8 @@ from scripts.utils import *
 current_screen = SCREEN_MENU
 current_selected_option_menu = 0
 audio_on = True
-button_width = 200
-button_height = 50
-global_speed = 1
-min_speed = 1
-max_speed = 6
-speed_increment = 0.05
-animation_interval_player_engine = 20
+global_speed = MIN_SPEED
+animation_interval_player_engine = ANIMATION_INTERVAL_PLAYER_ENGINE
 player = Actor("frigate")
 player.x = WIDTH / 2
 player.y = HEIGHT - TILE_SIZE
@@ -28,39 +23,25 @@ player_engine.y = HEIGHT - TILE_SIZE
 accelerating = False
 braking = False
 bullets = []
-bullet_animation_frames = 4
-bullet_interval = 5
 bullet_animations = {}
-
-shooting = False
-shoot_interval = 15
+bullet_animation_frames = BULLET_ANIMATION_FRAMES
 shoot_timer = 0
-reload_time = 60
-is_reloading = False
-reload_timer = 0
+shooting = False
 charging = False
 charge_timer = 0
-charge_duration = 60
+energy = MAX_ENERGY
+heart = MAX_HEALTH
+shield = MAX_SHIELD
 
-energy = 100
-max_energy = 100
-
-heart = 100
-max_health = 100
-
-shield = 100
-max_shield = 100
-
-energy_regeneration_rate = 1
-heart_regeneration_rate = 1
-shield_regeneration_rate = 1
-
-energy_cost_acceleration = 1
+energy_regeneration_rate = ENERGY_REGENERATION_RATE
+heart_regeneration_rate = HEART_REGENERATION_RATE
+shield_regeneration_rate = SHIELD_REGENERATION_RATE
+energy_cost_acceleration = ENERGY_COST_ACCELERATION
 
 buttons = {
-    "start": Rect((WIDTH // 2 - button_width // 2, 200), (button_width, button_height)),
-    "audio": Rect((WIDTH // 2 - button_width // 2, 300), (button_width, button_height)),
-    "exit": Rect((WIDTH // 2 - button_width // 2, 400), (button_width, button_height))
+    "start": Rect((WIDTH // 2 - BUTTON_WIDTH // 2, 200), (BUTTON_WIDTH, BUTTON_HEIGHT)),
+    "audio": Rect((WIDTH // 2 - BUTTON_WIDTH // 2, 300), (BUTTON_WIDTH, BUTTON_HEIGHT)),
+    "exit": Rect((WIDTH // 2 - BUTTON_WIDTH // 2, 400), (BUTTON_WIDTH, BUTTON_HEIGHT))
 }
 
 stars = generate_stars()
@@ -68,37 +49,28 @@ stars = generate_stars()
 
 def draw():
     screen.clear()
-    if current_screen == "menu":
+    if current_screen == SCREEN_MENU:
         draw_menu()
-    elif current_screen == "game":
+    elif current_screen == SCREEN_GAME:
         draw_game()
 
 
 def update():
-    global player, global_speed, animation_interval_player_engine, shoot_timer, charging, charge_timer, accelerating, braking, bullets, energy, heart, shield, energy_regeneration_rate, heart_regeneration_rate, shield_regeneration_rate, bullet_animations
+    global player, global_speed, animation_interval_player_engine, shoot_timer, charging, charge_timer, accelerating, braking, bullets, energy, heart, shield, bullet_animations
 
     update_stars(stars, global_speed)
     player = handle_player_input(player, global_speed, keyboard)
+    adjust_speed()
     update_animation(player_engine_animation, animation_interval_player_engine)
-
-    # Atualização de energia, vida e escudo
     energy, heart, shield = update_energy_health_shield(
-        energy, heart, shield, max_energy, max_health, max_shield, energy_regeneration_rate, heart_regeneration_rate, shield_regeneration_rate, global_speed)
-
-    # Atualização de energia, vida e escudo
-    energy, heart, shield = update_energy_health_shield(
-        energy, heart, shield, max_energy, max_health, max_shield, energy_regeneration_rate, heart_regeneration_rate, shield_regeneration_rate, global_speed)
-
-    # Aceleração e desaceleração
+        energy, heart, shield, global_speed)
     global_speed, accelerating, braking = handle_acceleration_and_braking(
-        accelerating, braking, energy, global_speed, energy_cost_acceleration, speed_increment, max_speed, min_speed)
-
-    # Carregamento e tiro especial
+        accelerating, braking, energy, global_speed)
     if charging:
         charge_timer -= 1
         if charge_timer <= 0:
             new_bullet = Actor("big_bullet-1", (player.x, player.y - 12))
-            new_bullet.damage = 50
+            new_bullet.damage = DAMAGE_BULLET_BIG
             new_bullet.energy_cost = ENERGY_COST_BIG_BULLET
             bullets.append(new_bullet)
             bullet_animations[new_bullet] = setup_animation(
@@ -106,18 +78,15 @@ def update():
             play_sound_big_bullet(sounds, audio_on)
             energy -= new_bullet.energy_cost
             charging = False
-    # Tiro comum
-    shoot_timer, energy, bullets, bullet_animations = handle_shooting(
-        shooting, energy, shoot_timer, shoot_interval, bullets, player, bullet_animations, sounds, audio_on, bullet_animation_frames)
 
-    # Atualização das balas
-    update_bullets(bullets, bullet_animations, bullet_animation_frames)
+    shoot_timer, energy, bullets, bullet_animations = handle_shooting(
+        shooting, energy, shoot_timer, bullets, player, bullet_animations, sounds, audio_on)
+    update_bullets(bullets, bullet_animations)
 
 
 def draw_menu():
     screen.fill(BACKGROUND_COLOR)
-    screen.draw.text("Alone Space", center=(
-        WIDTH // 2, 100), fontsize=50, color=WHITE)
+    screen.draw.text(TITLE, center=(WIDTH // 2, 100), fontsize=50, color=WHITE)
 
     for i, name in enumerate(MENU_OPTIONS):
         rect = buttons[name]
@@ -137,17 +106,16 @@ def draw_game():
     for bullet in bullets:
         bullet.draw()
 
-    draw_bars(screen, energy, heart, shield,
-              max_energy, max_health, max_shield)
+    draw_bars(screen, energy, heart, shield)
 
 
 def on_key_down(key):
     global current_selected_option_menu, current_screen, audio_on, shooting, charging, charge_timer, global_speed, accelerating, braking
 
-    if current_screen == "menu":
+    if current_screen == SCREEN_MENU:
         current_selected_option_menu, current_screen, audio_on = handle_menu_input(
             current_selected_option_menu, current_screen, audio_on, MENU_OPTIONS, sounds, keyboard)
-    elif current_screen == "game":
+    elif current_screen == SCREEN_GAME:
         current_screen = handle_game_input(
             current_screen, audio_on, sounds, keyboard)
 
@@ -156,7 +124,7 @@ def on_key_down(key):
 
     if key == keys.Q and not charging and energy >= ENERGY_COST_BIG_BULLET:
         charging = True
-        charge_timer = charge_duration
+        charge_timer = CHARGE_DURATION
         play_sound_charging(sounds, audio_on)
 
     if key == keys.W:
@@ -175,6 +143,14 @@ def on_key_up(key):
     if key == keys.S:
         braking = False
 
+def adjust_speed():
+    global global_speed, animation_interval_player_engine
+    if accelerating:
+        global_speed = min(global_speed + SPEED_INCREMENT, MAX_SPEED)
+    elif braking:
+        global_speed = max(global_speed - SPEED_INCREMENT, MIN_SPEED)
+
+    animation_interval_player_engine = max(int(10 - global_speed), 1)
 
 play_music_menu(sounds, audio_on)
 
