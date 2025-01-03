@@ -12,16 +12,14 @@ current_selected_option_menu = 0
 audio_on = True
 global_speed = MIN_SPEED
 animation_interval_player_engine = ANIMATION_INTERVAL_PLAYER_ENGINE
-player = Actor("frigate")
-player.x = WIDTH / 2
-player.y = HEIGHT - TILE_SIZE
-
-player_engine = Actor("frigate_engine-1")
+player = Actor("frigate", (WIDTH / 2, HEIGHT - TILE_SIZE))
+player_engine = Actor("frigate_engine-1", (player.x, player.y))
 player_engine_animation = setup_animation(player_engine, "frigate_engine", 6)
-player_engine.x = WIDTH / 2
-player_engine.y = HEIGHT - TILE_SIZE
+player_shield = Actor("shield-1", (player.x, player.y))
+player_shield_animation = setup_animation(player_shield, "shield", 40)
 accelerating = False
 braking = False
+shield_active = False
 bullets = []
 bullet_animations = {}
 bullet_animation_frames = BULLET_ANIMATION_FRAMES
@@ -56,12 +54,15 @@ def draw():
 
 
 def update():
-    global player, global_speed, animation_interval_player_engine, shoot_timer, charging, charge_timer, accelerating, braking, bullets, energy, heart, shield, bullet_animations
+    global player, global_speed, animation_interval_player_engine, shoot_timer, charging, charge_timer, accelerating, braking, bullets, energy, heart, shield, bullet_animations, player_shield_animation
 
     update_stars(stars, global_speed)
     player = handle_player_input(player, global_speed, keyboard)
     adjust_speed()
     update_animation(player_engine_animation, animation_interval_player_engine)
+    if shield_active and shield > ENERGY_COST_SHIELD:
+        shield -= ENERGY_COST_SHIELD
+        update_animation(player_shield_animation, 1)
     energy, heart, shield = update_energy_health_shield(
         energy, heart, shield, global_speed)
     global_speed, accelerating, braking = handle_acceleration_and_braking(
@@ -97,20 +98,28 @@ def draw_menu():
 
 
 def draw_game():
+    global energy, heart, shield, shield_active
     screen.fill(BACKGROUND_COLOR)
     draw_stars(stars, screen)
     player.draw()
     player_engine.x = player.x
     player_engine.draw()
-
+    
+    if shield_active and shield > 0:
+        player_shield.x = player.x
+        player_shield.draw()
+    else:
+        shield_active = False
+    print(shield_active)
     for bullet in bullets:
         bullet.draw()
 
     draw_bars(screen, energy, heart, shield)
 
 
+
 def on_key_down(key):
-    global current_selected_option_menu, current_screen, audio_on, shooting, charging, charge_timer, global_speed, accelerating, braking
+    global current_selected_option_menu, current_screen, audio_on, shooting, charging, charge_timer, global_speed, accelerating, braking, shield_active
 
     if current_screen == SCREEN_MENU:
         current_selected_option_menu, current_screen, audio_on = handle_menu_input(
@@ -132,6 +141,9 @@ def on_key_down(key):
 
     if key == keys.S:
         braking = True
+    
+    if key == keys.SPACE and shield > 0:
+        shield_active = not shield_active
 
 
 def on_key_up(key):
