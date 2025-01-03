@@ -20,3 +20,14 @@ def play_sound_starting(sounds, audio_on):
         sounds.menu.stop()
         sounds.starting.play()
 
+def play_sound_shooting_bullet(sounds, audio_on):
+    if audio_on:
+        sounds.bullet.play()
+
+def play_sound_big_bullet(sounds, audio_on):
+    if audio_on:
+        sounds.big_bullet.play()
+
+def play_sound_charging(sounds, audio_on):
+    if audio_on:
+        sounds.charging.play()
