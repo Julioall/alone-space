@@ -2,7 +2,7 @@ from scripts.constants import *
 def play_music_menu(sounds, audio_on):
     if audio_on:
         sounds.running.stop()
-        sounds.menu.play()
+        sounds.menu.play(-1)
     else:
         sounds.menu.stop()
 
@@ -13,12 +13,12 @@ def play_sound_select(sounds, audio_on):
 def play_sound_running(sounds, audio_on):
     if audio_on:
         sounds.menu.stop()
-        sounds.running.play()
+        sounds.running.play(-1)
 
-def play_sound_starting(sounds, audio_on):
+def play_sound_start(sounds, audio_on):
     if audio_on:
         sounds.menu.stop()
-        sounds.starting.play()
+        sounds.start.play()
 
 def play_sound_shooting_bullet(sounds, audio_on):
     if audio_on:
@@ -31,3 +31,11 @@ def play_sound_big_bullet(sounds, audio_on):
 def play_sound_charging(sounds, audio_on):
     if audio_on:
         sounds.charging.play()
+
+def play_sound_shields(sounds, audio_on):
+    if audio_on:
+        sounds.shields.play()
+
+def stop_sound_shields(sounds, audio_on):
+    if audio_on:
+        sounds.shields.stop()

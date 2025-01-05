@@ -1,7 +1,6 @@
 import pgzrun
 from pygame import Rect
 from pgzero.actor import Actor
-
 from scripts.constants import *
 from scripts.sounds import *
 from scripts.animations import *
@@ -54,19 +53,29 @@ def draw():
 
 
 def update():
-    global player, global_speed, animation_interval_player_engine, shoot_timer, charging, charge_timer, accelerating, braking, bullets, energy, heart, shield, bullet_animations, player_shield_animation
+    global player, global_speed, animation_interval_player_engine, shoot_timer, charging, charge_timer, accelerating, braking, bullets, energy, heart, shield, bullet_animations, player_shield_animation, shield_active
 
     update_stars(stars, global_speed)
     player = handle_player_input(player, global_speed, keyboard)
     adjust_speed()
     update_animation(player_engine_animation, animation_interval_player_engine)
-    if shield_active and shield > ENERGY_COST_SHIELD:
+
+    if shield_active and shield >= ENERGY_COST_SHIELD:
+        play_sound_shields(sounds, audio_on)
         shield -= ENERGY_COST_SHIELD
         update_animation(player_shield_animation, 1)
+
+    if shield_active and shield <= 0:
+        shield_active = False
+
+    if not shield_active:
+        stop_sound_shields(sounds, audio_on)
+
     energy, heart, shield = update_energy_health_shield(
         energy, heart, shield, global_speed)
     global_speed, accelerating, braking = handle_acceleration_and_braking(
         accelerating, braking, energy, global_speed)
+
     if charging:
         charge_timer -= 1
         if charge_timer <= 0:
@@ -104,13 +113,13 @@ def draw_game():
     player.draw()
     player_engine.x = player.x
     player_engine.draw()
-    
-    if shield_active and shield > 0:
+
+    if shield_active and shield > ENERGY_COST_SHIELD:
         player_shield.x = player.x
         player_shield.draw()
     else:
         shield_active = False
-    print(shield_active)
+
     for bullet in bullets:
         bullet.draw()
 
@@ -128,10 +137,10 @@ def on_key_down(key):
         current_screen = handle_game_input(
             current_screen, audio_on, sounds, keyboard)
 
-    if key == keys.E and energy >= ENERGY_COST_BULLET:
+    if key == keys.E and energy >= ENERGY_COST_BULLET and not shield_active:
         shooting = True
 
-    if key == keys.Q and not charging and energy >= ENERGY_COST_BIG_BULLET:
+    if key == keys.Q and not charging and energy >= ENERGY_COST_BIG_BULLET and not shield_active:
         charging = True
         charge_timer = CHARGE_DURATION
         play_sound_charging(sounds, audio_on)
@@ -141,8 +150,8 @@ def on_key_down(key):
 
     if key == keys.S:
         braking = True
-    
-    if key == keys.SPACE and shield > 0:
+
+    if key == keys.F and shield > ENERGY_COST_SHIELD:
         shield_active = not shield_active
 
 
@@ -155,6 +164,7 @@ def on_key_up(key):
     if key == keys.S:
         braking = False
 
+
 def adjust_speed():
     global global_speed, animation_interval_player_engine
     if accelerating:
@@ -163,6 +173,7 @@ def adjust_speed():
         global_speed = max(global_speed - SPEED_INCREMENT, MIN_SPEED)
 
     animation_interval_player_engine = max(int(10 - global_speed), 1)
+
 
 play_music_menu(sounds, audio_on)
 
