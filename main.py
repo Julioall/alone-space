@@ -52,6 +52,7 @@ buttons = {
 
 stars = generate_stars()
 
+
 def create_enemy(x, y):
     return {
         "x": x,
@@ -64,14 +65,20 @@ def create_enemy(x, y):
         "vertical_move_speed": 1,
         "amplitude": 20,
     }
+
+
 def move_sideways_random(enemy):
     enemy["x"] += enemy["side_move_direction"] * enemy["side_move_speed"]
     if random.random() < 0.01:
         enemy["side_move_direction"] *= -1
+
+
 def enemy_attack(enemy):
     if random.random() < 0.02:
         bullet = Rect((enemy["x"], enemy["y"] + TILE_SIZE), (5, 10))
         enemy_bullets.append(bullet)
+
+
 def update_enemy(enemy):
     if not enemy["attack_initiated"]:
         if enemy["y"] > enemy["target_y"]:
@@ -80,11 +87,12 @@ def update_enemy(enemy):
 
     move_sideways_random(enemy)
 
-    # Inverter direção se sair da tela
     if enemy["x"] < 0 or enemy["x"] > WIDTH:
         enemy["side_move_direction"] *= -1
 
     enemy_attack(enemy)
+
+
 def draw_enemies():
     for enemy in enemies:
         enemy_actor = Actor("scout", (enemy["x"], enemy["y"]))
@@ -92,6 +100,7 @@ def draw_enemies():
 
     for bullet in enemy_bullets:
         screen.draw.filled_rect(bullet, (255, 0, 0))
+
 
 def update_enemies():
     global enemy_spawn_timer, enemies_killed, initial_wave_size
@@ -112,12 +121,16 @@ def update_enemies():
             enemies.remove(enemy)
 
     increase_enemy_wave_size()
+
+
 def increase_enemy_wave_size():
     global initial_wave_size, enemies_killed, level
     if enemies_killed >= initial_wave_size*level:
         initial_wave_size += 1
         level += 1
         enemies_killed = 0
+
+
 def spawn_enemy_wave():
     global initial_wave_size
     for _ in range(initial_wave_size):
@@ -125,11 +138,15 @@ def spawn_enemy_wave():
         y = -TILE_SIZE
         enemy = Enemy(x, y)
         enemies.append(enemy)
+
+
 def update_enemy_bullets():
     for bullet in enemy_bullets[:]:
         bullet.y += ENEMY_BULLET_SPEED
         if bullet.y > HEIGHT:
             enemy_bullets.remove(bullet)
+
+
 def check_collision_bullets_enemies():
     global bullets, enemies, enemies_killed, total_enemies_killed
 
@@ -142,13 +159,17 @@ def check_collision_bullets_enemies():
             if bullet_rect.colliderect(enemy_rect):
                 damage = DAMAGE_BULLET if "big_bullet" not in bullet.image else DAMAGE_BULLET_BIG
                 enemy["health"] -= damage
-                bullets.remove(bullet)
+
+                if "big_bullet" not in bullet.image:
+                    bullets.remove(bullet)
 
                 if enemy["health"] <= 0:
                     enemies_killed += 1
                     total_enemies_killed += 1
                     enemies.remove(enemy)
                 break
+
+
 def check_collision_player_with_enemy_bullets():
     global heart, current_screen, level, total_enemies_killed, enemies_killed, initial_wave_size
     for bullet in enemy_bullets[:]:
@@ -159,25 +180,26 @@ def check_collision_player_with_enemy_bullets():
                 heart = 0
                 current_screen = SCREEN_GAME_OVER
 
+
 def draw_game_over():
     screen.fill(BACKGROUND_COLOR)
     screen.draw.text(
         "GAME OVER", center=(WIDTH // 2, HEIGHT // 4), fontsize=60, color=WHITE
     )
     screen.draw.text(
-        f"Level alcançado: {level - 4}",
+        f"Level reached: {level - 4}",
         center=(WIDTH // 2, HEIGHT // 2 - 50),
         fontsize=30,
         color=WHITE,
     )
     screen.draw.text(
-        f"Inimigos derrotados: {total_enemies_killed}",
+        f"Enemies defeated: {total_enemies_killed}",
         center=(WIDTH // 2, HEIGHT // 2),
         fontsize=30,
         color=WHITE,
     )
     screen.draw.text(
-        "Pressione ESC para voltar ao menu",
+        "Press ESC to return to the menu",
         center=(WIDTH // 2, HEIGHT - HEIGHT // 4),
         fontsize=25,
         color=WHITE,
@@ -194,54 +216,53 @@ def draw():
         draw_instructions()
     elif current_screen == SCREEN_GAME_OVER:
         draw_game_over()
-        
 
 
 def update():
-    global player, global_speed, animation_interval_player_engine, shoot_timer, charging, charge_timer, accelerating, braking, bullets, energy, heart, shield, bullet_animations, player_shield_animation, shield_active
+    global player, global_speed, animation_interval_player_engine, shoot_timer, charging, charge_timer, accelerating, braking, bullets, energy, heart, shield, bullet_animations, player_shield_animation, shield_active, current_screen
 
-    update_stars(stars, global_speed)
-    player = handle_player_input(player, global_speed, keyboard)
-    adjust_speed()
-    update_animation(player_engine_animation, animation_interval_player_engine)
+    if current_screen == SCREEN_GAME:
+        update_stars(stars, global_speed)
+        player = handle_player_input(player, global_speed, keyboard)
+        adjust_speed()
+        update_animation(player_engine_animation, animation_interval_player_engine)
 
-    if shield_active and shield >= ENERGY_COST_SHIELD:
-        play_sound_shields(sounds, audio_on)
-        shield -= ENERGY_COST_SHIELD
-        update_animation(player_shield_animation, 1)
+        if shield_active and shield >= ENERGY_COST_SHIELD:
+            play_sound_shields(sounds, audio_on)
+            shield -= ENERGY_COST_SHIELD
+            update_animation(player_shield_animation, 1)
 
-    if shield_active and shield <= 0:
-        shield_active = False
+        if shield_active and shield <= 0:
+            shield_active = False
 
-    if not shield_active:
-        stop_sound_shields(sounds, audio_on)
+        if not shield_active:
+            stop_sound_shields(sounds, audio_on)
 
-    energy, heart, shield = update_energy_health_shield(
-        energy, heart, shield, global_speed)
-    global_speed, accelerating, braking = handle_acceleration_and_braking(
-        accelerating, braking, energy, global_speed)
+        energy, heart, shield = update_energy_health_shield(
+            energy, heart, shield, global_speed)
+        global_speed, accelerating, braking = handle_acceleration_and_braking(
+            accelerating, braking, energy, global_speed)
 
-    if charging:
-        charge_timer -= 1
-        if charge_timer <= 0:
-            new_bullet = Actor("big_bullet-1", (player.x, player.y - 12))
-            new_bullet.damage = DAMAGE_BULLET_BIG
-            new_bullet.energy_cost = ENERGY_COST_BIG_BULLET
-            bullets.append(new_bullet)
-            bullet_animations[new_bullet] = setup_animation(
-                new_bullet, "big_bullet", bullet_animation_frames)
-            play_sound_big_bullet(sounds, audio_on)
-            energy -= new_bullet.energy_cost
-            charging = False
+        if charging:
+            charge_timer -= 1
+            if charge_timer <= 0:
+                new_bullet = Actor("big_bullet-1", (player.x, player.y - 12))
+                new_bullet.damage = DAMAGE_BULLET_BIG
+                new_bullet.energy_cost = ENERGY_COST_BIG_BULLET
+                bullets.append(new_bullet)
+                bullet_animations[new_bullet] = setup_animation(
+                    new_bullet, "big_bullet", bullet_animation_frames)
+                play_sound_big_bullet(sounds, audio_on)
+                energy -= new_bullet.energy_cost
+                charging = False
 
-    shoot_timer, energy, bullets, bullet_animations = handle_shooting(
-        shooting, energy, shoot_timer, bullets, player, bullet_animations, sounds, audio_on)
-    update_bullets(bullets, bullet_animations)
-    update_enemies()
-    update_enemy_bullets()
-    check_collision_bullets_enemies()
-    check_collision_player_with_enemy_bullets()
-
+        shoot_timer, energy, bullets, bullet_animations = handle_shooting(
+            shooting, energy, shoot_timer, bullets, player, bullet_animations, sounds, audio_on)
+        update_bullets(bullets, bullet_animations)
+        update_enemies()
+        update_enemy_bullets()
+        check_collision_bullets_enemies()
+        check_collision_player_with_enemy_bullets()
 
 def draw_menu():
     screen.fill(BACKGROUND_COLOR)
@@ -325,12 +346,13 @@ def on_key_down(key):
     elif current_screen == SCREEN_GAME:
         current_screen = handle_game_input(
             current_screen, audio_on, sounds, keyboard)
-        
+
     elif current_screen == SCREEN_GAME_OVER:
         global level, total_enemies_killed, enemies_killed, initial_wave_size
         current_screen = handle_game_input(
             current_screen, audio_on, sounds, keyboard)
-        reset_game()
+        if current_screen == SCREEN_MENU:
+            reset_game()
 
     if key == keys.E and energy >= ENERGY_COST_BULLET and not shield_active:
         shooting = True
@@ -368,6 +390,7 @@ def adjust_speed():
         global_speed = max(global_speed - SPEED_INCREMENT, MIN_SPEED)
 
     animation_interval_player_engine = max(int(10 - global_speed), 1)
+
 
 def reset_game():
     global enemies, enemy_bullets, bullets, player, level, total_enemies_killed, enemies_killed, initial_wave_size, heart, energy, shield

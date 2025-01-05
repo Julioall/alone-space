@@ -50,17 +50,20 @@ def handle_game_input(current_screen, audio_on, sounds, keyboard):
         current_screen = SCREEN_MENU
     return current_screen
 
+
 def handle_instructions_input(current_screen, audio_on, sounds, keyboard):
     if keyboard.ESCAPE:
         play_music_menu(sounds, audio_on)
         current_screen = SCREEN_MENU
     return current_screen
 
+
 def handle_gameover_input(current_screen, audio_on, sounds, keyboard):
     if keyboard.ESCAPE:
         play_music_menu(sounds, audio_on)
         current_screen = SCREEN_MENU
     return current_screen
+
 
 def handle_player_input(player, global_speed, keyboard):
     if keyboard.A:
@@ -119,13 +122,12 @@ def draw_bars(screen, energy, heart, shield):
     energy_bar_width = 300
     energy_bar_height = 5
 
-    # Usando as constantes definidas para os valores de saúde, escudo e energia
     screen.draw.filled_rect(Rect(10, 10, heart * (energy_bar_width /
-                            MAX_HEALTH), energy_bar_height), RED)  # Vermelho para vida
+                            MAX_HEALTH), energy_bar_height), RED)
     screen.draw.filled_rect(Rect(10, 20, shield * (energy_bar_width /
-                            MAX_SHIELD), energy_bar_height), BLUE)  # Azul para escudo
+                            MAX_SHIELD), energy_bar_height), BLUE)
     screen.draw.filled_rect(Rect(10, 30, energy * (energy_bar_width /
-                            MAX_ENERGY), energy_bar_height), GREEN)  # Verde para energia
+                            MAX_ENERGY), energy_bar_height), GREEN)
 
 
 def update_energy_health_shield(energy, heart, shield, global_speed):
