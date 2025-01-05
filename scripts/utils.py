@@ -56,12 +56,17 @@ def handle_instructions_input(current_screen, audio_on, sounds, keyboard):
         current_screen = SCREEN_MENU
     return current_screen
 
+def handle_gameover_input(current_screen, audio_on, sounds, keyboard):
+    if keyboard.ESCAPE:
+        play_music_menu(sounds, audio_on)
+        current_screen = SCREEN_MENU
+    return current_screen
 
 def handle_player_input(player, global_speed, keyboard):
-    if keyboard.LEFT or keyboard.A:
+    if keyboard.A:
         if player.left > 0:
             player.x -= global_speed + 3
-    if keyboard.RIGHT or keyboard.D:
+    if keyboard.D:
         if player.right < WIDTH:
             player.x += global_speed + 3
     return player
