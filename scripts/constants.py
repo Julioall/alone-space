@@ -19,7 +19,8 @@ BLUE = (0, 0, 255)
 TITLE = "Alone Space"
 SCREEN_MENU = "menu"
 SCREEN_GAME = "game"
-MENU_OPTIONS = ["start", "audio", "exit"]
+SCREEN_INSTRUCTIONS = "instructions"
+MENU_OPTIONS = ["start", "instructions", "audio", "exit"]
 
 # Constantes de energia, vida, escudo e velocidade
 MAX_ENERGY = 100

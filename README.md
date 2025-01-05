@@ -4,16 +4,9 @@
 
 ## Controles
 
-- **Movimentação da Nave:**
-  - Use as teclas **A** ou **Seta Esquerda** para mover a nave para a esquerda.
-  - Use as teclas **D** ou **Seta Direita** para mover a nave para a direita.
-
-- **Atirar:**
-  - Pressione a tecla **Espaço** para disparar tiros da nave.
-  
 - **Menu Principal:**
-  - Use as teclas **Seta para Cima** ou **W** para selecionar a opção acima.
-  - Use as teclas **Seta para Baixo** ou **S** para selecionar a opção abaixo.
+  - Use as teclas **W** para selecionar a opção acima.
+  - Use as teclas **S** para selecionar a opção abaixo.
   - Pressione **Espaço** para confirmar a seleção.
   
 - **Mudar o volume:**
@@ -22,8 +15,25 @@
 - **Pausar o Jogo:**
   - Pressione **Esc** durante o jogo para retornar ao menu principal.
 
+- **Movimentação da Nave:**
+  - Use as teclas **A** para mover a nave para a esquerda.
+  - Use as teclas **D** para mover a nave para a direita.
+  - Use as teclas **W** para acelerar.
+  - Use as teclas **S** para reduzir a velocidade (frear).
+
+- **Atirar:**
+  - Pressione a tecla **E** para disparar tiros leves (menor custo de energia, menor dano).
+  - Pressione a tecla **Q** para disparar um ataque pesado (maior custo de energia, maior dano).
+
+- **Escudo:**
+  - Pressione a tecla **F** para ativar ou desativar o escudo (consome energia do escudo).
+
 ## Objetivo
 
-O objetivo do jogo é sobreviver o maior tempo possível enquanto navega por um campo de asteroides e inimigos. À medida que o tempo passa, o jogo fica mais difícil com o aumento e intensidade dos inimigos.
+O objetivo do jogo é eliminar o maior número possível de inimigos enquanto gerencia sua energia, saúde e escudo.
+
+- **Energia:** Usada para acelerar, atirar. Regenera automaticamente com o tempo.
+- **Saúde:** Mostra sua vida no jogo. Regenera lentamente.
+- **Escudo:** Protege a nave de danos. Consome energia quando ativado. Regenera lentamente.
 
 ## Boa sorte e divirta-se!

@@ -36,10 +36,12 @@ shield_regeneration_rate = SHIELD_REGENERATION_RATE
 energy_cost_acceleration = ENERGY_COST_ACCELERATION
 
 buttons = {
-    "start": Rect((WIDTH // 2 - BUTTON_WIDTH // 2, 200), (BUTTON_WIDTH, BUTTON_HEIGHT)),
-    "audio": Rect((WIDTH // 2 - BUTTON_WIDTH // 2, 300), (BUTTON_WIDTH, BUTTON_HEIGHT)),
-    "exit": Rect((WIDTH // 2 - BUTTON_WIDTH // 2, 400), (BUTTON_WIDTH, BUTTON_HEIGHT))
+    "start": Rect((WIDTH // 2 - BUTTON_WIDTH // 2, 150), (BUTTON_WIDTH, BUTTON_HEIGHT)),
+    "instructions": Rect((WIDTH // 2 - BUTTON_WIDTH // 2, 250), (BUTTON_WIDTH, BUTTON_HEIGHT)),
+    "audio": Rect((WIDTH // 2 - BUTTON_WIDTH // 2, 350), (BUTTON_WIDTH, BUTTON_HEIGHT)),
+    "exit": Rect((WIDTH // 2 - BUTTON_WIDTH // 2, 450), (BUTTON_WIDTH, BUTTON_HEIGHT))
 }
+
 
 stars = generate_stars()
 
@@ -50,6 +52,9 @@ def draw():
         draw_menu()
     elif current_screen == SCREEN_GAME:
         draw_game()
+    elif current_screen == SCREEN_INSTRUCTIONS:
+        draw_instructions()
+
 
 
 def update():
@@ -96,14 +101,40 @@ def update():
 
 def draw_menu():
     screen.fill(BACKGROUND_COLOR)
-    screen.draw.text(TITLE, center=(WIDTH // 2, 100), fontsize=50, color=WHITE)
+    screen.draw.text(TITLE, center=(WIDTH // 2, 100), fontsize=30, color=WHITE)
 
     for i, name in enumerate(MENU_OPTIONS):
         rect = buttons[name]
         color = WHITE if i != current_selected_option_menu else (200, 200, 255)
         screen.draw.filled_rect(rect, color)
         screen.draw.text(name.capitalize(), center=rect.center,
-                         fontsize=30, color=BLACK)
+                         fontsize=25, color=BLACK)
+
+def draw_instructions():
+    screen.fill(BACKGROUND_COLOR)
+    screen.draw.text("Instruções", center=(WIDTH // 2, 50), fontsize=40, color=WHITE)
+
+    instructions_text = [
+        "Game Instructions:",
+        "W - Accelerate | S - Brake | A and D - Move sideways",
+        "",
+        "Attacks:",
+        "Q - Heavy attack (high energy cost, greater damage)",
+        "E - Light attack (lower energy cost, less damage)",
+        "",
+        "Shield:",
+        "F - Activate/deactivate shield (consumes shield energy)",
+        "",
+        "Objective:",
+        "Eliminate as many enemies as possible before being defeated!",
+        "",
+        "Press ESC to return to the menu."
+    ]
+
+    y = 100
+    for line in instructions_text:
+        screen.draw.text(line, center=(WIDTH // 2, y), fontsize=25, color=WHITE)
+        y += 30
 
 
 def draw_game():
@@ -133,6 +164,11 @@ def on_key_down(key):
     if current_screen == SCREEN_MENU:
         current_selected_option_menu, current_screen, audio_on = handle_menu_input(
             current_selected_option_menu, current_screen, audio_on, MENU_OPTIONS, sounds, keyboard)
+        
+    elif current_screen == SCREEN_INSTRUCTIONS:
+        current_screen = handle_instructions_input(
+            current_screen, audio_on, sounds, keyboard)
+        
     elif current_screen == SCREEN_GAME:
         current_screen = handle_game_input(
             current_screen, audio_on, sounds, keyboard)

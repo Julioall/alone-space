@@ -21,6 +21,8 @@ def _select_menu_option(current_selected_option_menu, current_screen, audio_on, 
         current_screen = SCREEN_GAME
         play_sound_start(sounds, audio_on)
         play_sound_running(sounds, audio_on)
+    elif selected == "instructions":
+        current_screen = SCREEN_INSTRUCTIONS
     elif selected == "audio":
         audio_on = not audio_on
         play_music_menu(sounds, audio_on)
@@ -30,10 +32,10 @@ def _select_menu_option(current_selected_option_menu, current_screen, audio_on, 
 
 
 def handle_menu_input(current_selected_option_menu, current_screen, audio_on, MENU_OPTIONS, sounds, keyboard):
-    if keyboard.UP or keyboard.W:
+    if keyboard.W:
         current_selected_option_menu = _change_selected_option(
             -1, current_selected_option_menu, MENU_OPTIONS, sounds, audio_on)
-    elif keyboard.DOWN or keyboard.S:
+    elif keyboard.S:
         current_selected_option_menu = _change_selected_option(
             1, current_selected_option_menu, MENU_OPTIONS, sounds, audio_on)
     elif keyboard.SPACE:
@@ -43,6 +45,12 @@ def handle_menu_input(current_selected_option_menu, current_screen, audio_on, ME
 
 
 def handle_game_input(current_screen, audio_on, sounds, keyboard):
+    if keyboard.ESCAPE:
+        play_music_menu(sounds, audio_on)
+        current_screen = SCREEN_MENU
+    return current_screen
+
+def handle_instructions_input(current_screen, audio_on, sounds, keyboard):
     if keyboard.ESCAPE:
         play_music_menu(sounds, audio_on)
         current_screen = SCREEN_MENU
