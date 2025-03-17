@@ -1,5 +1,5 @@
 # Alone Space
-[![Demonstração de como jogar - Alone Space](captura.png)](https://www.loom.com/embed/88e840792f464c969e7b7cc4866fe585?sid=06435815-48ab-405e-9bf1-153c341a49ae)
+[![Demonstração de como jogar - Alone Space](captura.PNG)](https://www.loom.com/embed/88e840792f464c969e7b7cc4866fe585?sid=06435815-48ab-405e-9bf1-153c341a49ae)
 ## Como Jogar
 **Alone Space** é um jogo de navegação espacial onde você controla uma nave e deve sobreviver enquanto evita obstáculos e atira contra inimigos. Siga as instruções abaixo para aprender como jogar:
 
